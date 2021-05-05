@@ -49,11 +49,6 @@ class Venue(db.Model):
     seeking_description = db.Column(db.String())
 
     children = db.relationship('Show', backref='venue', lazy=True)
-    #"past_shows": [{
-    #  "artist_id": 4,
-    #  "artist_name": "Guns N Petals",
-    #  "artist_image_link": "https://images.unsplash.com/photo-1549213783-8284d0336c4f?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=300&q=80",
-    #  "start_time": "2019-05-21T21:30:00.000Z"
 
     # TODO: implement any missing fields, as a database migration using Flask-Migrate
 
@@ -249,6 +244,38 @@ def create_venue_form():
 
 @app.route('/venues/create', methods=['POST'])
 def create_venue_submission():
+  form = VenueForm(request.form, meta={'csrf': False})
+  if form.validate():
+    flash(form.name.data,form.city.data)
+    try:
+      new_venue = Venue(
+        name = form.name.data,
+        city = form.city.data,
+        state = form.state.data,
+        address = form.address.data,
+        phone = form.phone.data,
+        genres = form.genres.data,
+        facebook_link = form.facebook_link.data,
+        image_link = form.image_link.data,
+        website = form.website_link.data,
+        seeking_talent = form.seeking_talent.data,
+        seeking_description = form.seeking_description.data
+      )
+      db.session.add(new_venue)
+      db.session.commit()
+      flash('Venue ' + form.name.data + ' was successfully listed!')
+    except ValueError as e:
+      print(e)
+      db.session.rollback()
+      flash('An error occurred. Venue ' + form.name.data + ' could not be listed.')
+    finally:
+      db.session.close()
+  else:
+    message = []
+    for field, errors in form.errors.items():
+      message.append(field + ': (' + '|'.join(errors) + ')')
+  return render_template('pages/home.html')
+
   # TODO: insert form data as a new Venue record in the db, instead
   # TODO: modify data to be the data object returned from db insertion
 
