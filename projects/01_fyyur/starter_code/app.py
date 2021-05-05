@@ -14,6 +14,7 @@ from flask_wtf import Form
 from forms import *
 import config
 from flask_migrate import Migrate
+from datetime import datetime
 #----------------------------------------------------------------------------#
 # App Config.
 #----------------------------------------------------------------------------#
@@ -42,6 +43,18 @@ class Venue(db.Model):
     image_link = db.Column(db.String(500))
     facebook_link = db.Column(db.String(120))
 
+    genres = db.Column(db.ARRAY(db.String))
+    website = db.Column(db.String(120))
+    seeking_talent = db.Column(db.Boolean)
+    seeking_description = db.Column(db.String())
+
+    children = db.relationship('Show', backref='venue', lazy=True)
+    #"past_shows": [{
+    #  "artist_id": 4,
+    #  "artist_name": "Guns N Petals",
+    #  "artist_image_link": "https://images.unsplash.com/photo-1549213783-8284d0336c4f?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=300&q=80",
+    #  "start_time": "2019-05-21T21:30:00.000Z"
+
     # TODO: implement any missing fields, as a database migration using Flask-Migrate
 
 class Artist(db.Model):
@@ -52,12 +65,26 @@ class Artist(db.Model):
     city = db.Column(db.String(120))
     state = db.Column(db.String(120))
     phone = db.Column(db.String(120))
-    genres = db.Column(db.String(120))
+    genres = db.Column(db.ARRAY(db.String))
     image_link = db.Column(db.String(500))
     facebook_link = db.Column(db.String(120))
 
+    seeking_venue = db.Column(db.Boolean)
+    seeking_description = db.Column(db.Boolean)
+
+    children = db.relationship('Show', backref='artist', lazy=True)
+
     # TODO: implement any missing fields, as a database migration using Flask-Migrate
 
+class Show(db.Model):
+    __tablename__ = 'Show'
+
+    start_time = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+
+    venue_id = db.Column(db.Integer, db.ForeignKey('Venue.id'), nullable=False)
+    artist_id = db.Column(db.Integer, db.ForeignKey('Artist.id'), nullable=False)
+
+    id = db.Column(db.Integer, primary_key=True)
 # TODO Implement Show and Artist models, and complete all model relationships and properties, as a database migration.
 
 #----------------------------------------------------------------------------#
