@@ -147,16 +147,20 @@ def search_venues():
 @app.route('/venues/<int:venue_id>')
 def show_venue(venue_id):
   real_data = Venue.query.get(venue_id)                                                 #real_data is the information from the database corresponding to the venue_id 
+  
   past_shows = db.session.query(Artist, Show).join(Show).join(Venue).filter(
     Show.venue_id == venue_id,
     Show.artist_id == Artist.id,
     Show.start_time < datetime.now()
   ).all()
+  past_shows_count = len(past_shows)
+
   upcoming_shows = db.session.query(Artist, Show).join(Show).join(Venue).filter(        #get the show information and seperate it into past and upcoming by datetime
     Show.venue_id == venue_id,
     Show.artist_id == Artist.id,
     Show.start_time > datetime.now()
   ).all()
+  upcoming_shows_count = len(upcoming_shows)
 
   real_venue = {
     "id": real_data.id,
@@ -183,8 +187,8 @@ def show_venue(venue_id):
       "artist_image_link": artist.image_link,
       "start_time": show.start_time
     } for artist, show in upcoming_shows],
-    "past_shows_count": len(past_shows),
-    "upcoming_shows_count": len(upcoming_shows),
+    "past_shows_count": past_shows_count,
+    "upcoming_shows_count": upcoming_shows_count,
   }
   # shows the venue page with the given venue_id
   # TODO: replace with real venue data from the venues table, using venue_id
