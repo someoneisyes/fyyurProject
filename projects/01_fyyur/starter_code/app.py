@@ -147,7 +147,7 @@ def search_venues():
 @app.route('/venues/<int:venue_id>')
 def show_venue(venue_id):
   real_data = Venue.query.get(venue_id)                                                 #real_data is the information from the database corresponding to the venue_id 
-  
+                                                                                        #solution from https://knowledge.udacity.com/questions/386723 by Juliano V
   past_shows = db.session.query(Artist, Show).join(Show).join(Venue).filter(
     Show.venue_id == venue_id,
     Show.artist_id == Artist.id,
@@ -295,8 +295,8 @@ def show_artist(artist_id):
   # shows the artist page with the given artist_id
   # TODO: replace with real artist data from the artist table, using artist_id
   
-  real_data = Artist.query.get(artist_id)                                                #real_data is the information from the database corresponding to the venue_id 
-  
+  real_data = Artist.query.get(artist_id)                                                 #real_data is the information from the database corresponding to the venue_id 0
+                                                                                          #solution from https://knowledge.udacity.com/questions/386723 by Juliano V
   past_shows = db.session.query(Venue, Show).join(Show).join(Artist).filter(
     Show.venue_id == Venue.id,
     Show.artist_id == artist_id,
