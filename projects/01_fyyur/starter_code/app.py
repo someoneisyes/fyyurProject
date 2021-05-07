@@ -231,17 +231,14 @@ def create_venue_submission():
     for field, errors in form.errors.items():
       message.append(field + ': (' + '|'.join(errors) + ')')
       flash(message)
-  return render_template('pages/home.html')
+  return redirect(url_for('index'))
 
   # TODO: insert form data as a new Venue record in the db, instead
   # TODO: modify data to be the data object returned from db insertion
-
   # on successful db insert, flash success
-  flash('Venue ' + request.form['name'] + ' was successfully listed!')
   # TODO: on unsuccessful db insert, flash an error instead.
   # e.g., flash('An error occurred. Venue ' + data.name + ' could not be listed.')
   # see: http://flask.pocoo.org/docs/1.0/patterns/flashing/
-  return render_template('pages/home.html')
 
 @app.route('/venues/<venue_id>', methods=['POST'])
 def delete_venue(venue_id):
@@ -259,9 +256,10 @@ def delete_venue(venue_id):
     flash('An error occurred. Venue ' + form.name.data + ' was not deleted.')
   finally:
     db.session.close
+    
+  return none
   # BONUS CHALLENGE: Implement a button to delete a Venue on a Venue Page, have it so that
   # clicking that button delete it from the db then redirect the user to the homepage
-  return none
 
 #  Artists
 #  ----------------------------------------------------------------
@@ -294,16 +292,20 @@ def show_artist(artist_id):
   # TODO: replace with real artist data from the artist table, using artist_id
   
   real_data = Artist.query.get(artist_id)                                                #real_data is the information from the database corresponding to the venue_id 
+  
   past_shows = db.session.query(Venue, Show).join(Show).join(Artist).filter(
     Show.venue_id == Venue.id,
     Show.artist_id == artist_id,
     Show.start_time < datetime.now()
   ).all()
+  past_shows_count = len(past_shows)
+
   upcoming_shows = db.session.query(Venue, Show).join(Show).join(Artist).filter(
     Show.venue_id == Venue.id,
     Show.artist_id == artist_id,
     Show.start_time > datetime.now()
   ).all()
+  upcoming_shows_count = len(upcoming_shows)
 
   real_artist = {
     "id": real_data.id,
@@ -329,8 +331,8 @@ def show_artist(artist_id):
       "venue_image_link": venue.image_link,
       "start_time": show.start_time
     } for venue, show in upcoming_shows],
-    "past_shows_count": len(past_shows),
-    "upcoming_shows_count": len(upcoming_shows),
+    "past_shows_count": past_shows_count,
+    "upcoming_shows_count": upcoming_shows_count,
   }
   return render_template('pages/show_artist.html', artist=real_artist)
 
