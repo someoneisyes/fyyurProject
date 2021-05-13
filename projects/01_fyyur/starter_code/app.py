@@ -160,20 +160,9 @@ def create_venue_submission():
   form = VenueForm(request.form, meta={'csrf': False})
   if form.validate():
     try:
-      new_venue = Venue(
-        name = form.name.data,
-        city = form.city.data,
-        state = form.state.data,
-        address = form.address.data,
-        phone = form.phone.data,
-        genres = form.genres.data,
-        facebook_link = form.facebook_link.data,
-        image_link = form.image_link.data,
-        website = form.website_link.data,
-        seeking_talent = form.seeking_talent.data,
-        seeking_description = form.seeking_description.data
-      )
-      db.session.add(new_venue)
+      venue = Venue()
+      form.populate_obj(venue)
+      db.session.add(venue)
       db.session.commit()
       flash('Venue ' + form.name.data + ' was successfully listed!')
     except ValueError as e:
@@ -205,15 +194,14 @@ def delete_venue(venue_id):
     db.session.delete(venue)
     db.session.commit()
     flash('The Venue has been successfully deleted!')
-    return redirect(url_for('index'))
   except ValueError as e:
     print(e)
     db.session.rollback()
-    flash('An error occurred. Venue ' + form.name.data + ' was not deleted.')
+    flash('An error occurred. Venue ' + venue.name + ' was not deleted.')
   finally:
     db.session.close
     
-  return none
+  return redirect(url_for('index'))
   # BONUS CHALLENGE: Implement a button to delete a Venue on a Venue Page, have it so that
   # clicking that button delete it from the db then redirect the user to the homepage
 
@@ -407,18 +395,9 @@ def create_artist_submission():
   # TODO: modify data to be the data object returned from db insertion
   if form.validate():
     try:
-      new_artist = Artist(
-        name = form.name.data,
-        city = form.city.data,
-        state = form.state.data,
-        phone = form.phone.data,
-        genres = form.genres.data,
-        facebook_link = form.facebook_link.data,
-        image_link = form.image_link.data,
-        seeking_venue = form.seeking_venue.data,
-        seeking_description = form.seeking_description.data
-      )
-      db.session.add(new_artist)
+      artist = Artist()
+      form.populate_obj(artist)
+      db.session.add(artist)
       db.session.commit()
       flash('Artist ' + form.name.data + ' was successfully listed!')
     except ValueError as e:

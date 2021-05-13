@@ -4,7 +4,7 @@ from datetime import datetime
 db = SQLAlchemy()
 
 class Venue(db.Model):
-    __tablename__ = 'Venue'
+    __tablename__ = 'venue'
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String, nullable=False)
@@ -23,7 +23,7 @@ class Venue(db.Model):
     children = db.relationship('Show', backref='venue', lazy=True)
 
 class Artist(db.Model):
-    __tablename__ = 'Artist'
+    __tablename__ = 'artist'
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String, nullable=False)
@@ -41,11 +41,11 @@ class Artist(db.Model):
     children = db.relationship('Show', backref='artist', lazy=True)
 
 class Show(db.Model):
-    __tablename__ = 'Show'
+    __tablename__ = 'show'
 
     start_time = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
 
-    venue_id = db.Column(db.Integer, db.ForeignKey('Venue.id'), nullable=False)
-    artist_id = db.Column(db.Integer, db.ForeignKey('Artist.id'), nullable=False)
+    venue_id = db.Column(db.Integer, db.ForeignKey('venue.id'), nullable=False)
+    artist_id = db.Column(db.Integer, db.ForeignKey('artist.id'), nullable=False)
 
     id = db.Column(db.Integer, primary_key=True)
